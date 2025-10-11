@@ -1,5 +1,7 @@
-from PIL import Image
 import os
+
+from PIL import Image
+
 
 def compress_image(image_path, min_size_kb=100):
     """

@@ -8,6 +8,17 @@ requires-python = ">=3.12.4"
 authors = [
     { name = "Temiloluwa Adeoti", email = "temmiecvml@gmail.com" },
 ]
+dependencies = [
+    "black>=25.9.0",
+    "dotenv>=0.9.9",
+    "fastapi>=0.116.1",
+    "isort>=6.0.1",
+    "lint>=1.2.1",
+    "pydantic>=2.11.7",
+    "sqlalchemy>=2.0.43",
+    "typing>=3.10.0.0",
+    "uvicorn>=0.35.0",
+]
 
 [dependency-groups]
 backend = [
@@ -20,6 +31,11 @@ backend = [
     "omegaconf>=2.3.0",
     "pillow>=11.2.1",
     "python-json-logger>=3.3.0",
+    "requests>=2.32.3",
+    "boto3>=1.37.3",
+    "Pillow>=11.2.1",
+    "pytesseract>=0.3.10",
+    "PyYAML>=6.0.1",
     "requests>=2.32.3",
 ]
 
@@ -42,13 +58,6 @@ api = [
     "python-ulid>=3.0.0",
 ]
 
-backend = [
-    "boto3>=1.37.3",
-    "Pillow>=11.2.1",
-    "pytesseract>=0.3.10",
-    "PyYAML>=6.0.1",
-    "requests>=2.32.3",
-]
 
 [tool.mypy]
 python_version = 3.12

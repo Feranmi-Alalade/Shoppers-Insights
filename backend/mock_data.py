@@ -23,7 +23,11 @@ challenges = [
 posts = [
     {
         "id": "1",
-        "author": {"name": "Sarah Johnson", "avatar": "/api/placeholder/32/32", "level": 5},
+        "author": {
+            "name": "Sarah Johnson",
+            "avatar": "/api/placeholder/32/32",
+            "level": 5,
+        },
         "content": "Just saved $200 on groceries using the new budget tool! 🎉",
         "timestamp": "2025-07-14T09:00:00Z",
         "likes": 34,

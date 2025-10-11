@@ -1,6 +1,7 @@
 import pytesseract
 from PIL import Image
 
+
 def run_ocr(image_path):
     """
     Run OCR for an image and return extracted text.

@@ -1,19 +1,23 @@
+import os
+
 import yaml
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-import os
+
 
 # --- YAML Loader ---
 def read_yaml_file(filepath):
     """Read a YAML file and return its contents as a Python dict."""
-    with open(filepath, 'r') as f:
+    with open(filepath, "r") as f:
         return yaml.safe_load(f)
+
 
 # --- SQLAlchemy ORM Setup ---
 # Example: Use environment variables for DB connection
-DB_URL = os.getenv('DB_URL', 'sqlite:///shopper_insight.db')
+DB_URL = os.getenv("DB_URL", "sqlite:///shopper_insight.db")
 engine = create_engine(DB_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 # --- SQL Query Helpers ---
 def query_all(sql, params=None):
@@ -21,6 +25,7 @@ def query_all(sql, params=None):
     with engine.connect() as conn:
         result = conn.execute(text(sql), params or {})
         return [dict(row) for row in result]
+
 
 # Example ORM model usage (if you have models defined)
 # from models import Challenge
