@@ -5,14 +5,14 @@ from sqlalchemy import Column, DateTime, Float, Integer, String, Text
 class ReceiptDB(Base):
     __tablename__ = "receipts"
 
-    receipt_id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True)
     store = Column(String)
-    date = Column(DateTime)
     total = Column(Float)
+    date = Column(DateTime)
     items = Column(Integer)
-    status = Column(String, default="processing")
-    imageUrl = Column(String)
-
+    status = Column(String)
+    itemsList = Column(String)
+    categories = Column(String)
 
 class BudgetDB(Base):
     __tablename__ = "budgets"
