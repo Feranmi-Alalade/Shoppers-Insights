@@ -8,7 +8,7 @@ class ReceiptDB(Base):
     id = Column(Integer, primary_key=True, index=True)
     store = Column(String)
     total = Column(Float)
-    date = Column(DateTime)
+    date = Column(DateTime, nullable=True)
     items = Column(Integer)
     status = Column(String)
     itemsList = Column(String)
