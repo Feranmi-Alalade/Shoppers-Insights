@@ -1,0 +1,37 @@
+version: '3'
+
+tasks:
+  build:web:
+    desc: Build the Next.js frontend Docker image
+    cmds:
+      - docker build -f Dockerfile.web -t shopper-insight-web .
+
+  build:api:
+    desc: Build the FastAPI backend Docker image
+    cmds:
+      - docker build -f Dockerfile.api -t shopper-insight-api .
+
+  push:web:
+    desc: Push the Next.js frontend Docker image to Docker Hub
+    cmds:
+      - docker push yourdockerhubusername/shopper-insight-web:latest
+
+  push:api:
+    desc: Push the FastAPI backend Docker image to Docker Hub
+    cmds:
+      - docker push yourdockerhubusername/shopper-insight-api:latest
+
+  up:
+    desc: Start all services using docker-compose (images must be built and pushed first)
+    cmds:
+      - docker-compose up
+
+  down:
+    desc: Stop all running containers
+    cmds:
+      - docker-compose down
+
+  logs:
+    desc: Show logs for all services
+    cmds:
+      - docker-compose logs -f

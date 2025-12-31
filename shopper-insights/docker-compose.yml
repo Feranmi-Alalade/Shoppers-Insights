@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  web:
+    image: yourdockerhubusername/shopper-insight-web:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+
+  api:
+    image: yourdockerhubusername/shopper-insight-api:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1

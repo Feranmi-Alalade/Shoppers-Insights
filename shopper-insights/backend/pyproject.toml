@@ -1,0 +1,19 @@
+[project]
+name = "shopper-insight-backend"
+description = "Backend for Shopper Insight Lambda processing S3 images and running OCR."
+version = "0.1.0"
+authors = ["Bildcraft Team <team@bildcraft.com>"]
+requires-python = ">=3.9"
+
+[tool.uv]
+# uv is a fast Python package installer and resolver
+
+[dependencies]
+boto3 = "*"
+Pillow = "*"
+pytesseract = "*"
+PyYAML = "*"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"

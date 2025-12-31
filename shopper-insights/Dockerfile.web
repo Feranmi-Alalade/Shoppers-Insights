@@ -1,0 +1,8 @@
+# Dockerfile.web - Next.js Frontend
+FROM node:20-alpine
+WORKDIR /app
+COPY shopper-insights-app ./shopper-insights-app
+WORKDIR /app/shopper-insights-app
+RUN npm install && npm run build
+EXPOSE 3000
+CMD ["npm", "run", "start"]

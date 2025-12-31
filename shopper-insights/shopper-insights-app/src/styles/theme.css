@@ -1,0 +1,31 @@
+/* shopper-insights-app/src/styles/theme.css */
+:root {
+  --primary: #4f46e5; /* Indigo 600 */
+  --primary-hover: #4338ca; /* Indigo 700 */
+  --secondary: #6b7280; /* Gray 500 */
+  --accent: #10b981; /* Emerald 500 */
+  --background: #f9fafb; /* Gray 50 */
+  --card-background: #ffffff;
+  --text-primary: #1f2937; /* Gray 800 */
+  --text-secondary: #6b7280; /* Gray 500 */
+  --border: #e5e7eb; /* Gray 200 */
+
+  /* Chart Colors */
+  --chart-color-1: #3b82f6; /* Blue 500 */
+  --chart-color-2: #10b981; /* Emerald 500 */
+  --chart-color-3: #f59e0b; /* Amber 500 */
+  --chart-color-4: #ef4444; /* Red 500 */
+  --chart-color-5: #8b5cf6; /* Violet 500 */
+}
+
+[data-theme="dark"] {
+  --primary: #6366f1; /* Indigo 500 */
+  --primary-hover: #4f46e5; /* Indigo 600 */
+  --secondary: #9ca3af; /* Gray 400 */
+  --accent: #34d399; /* Emerald 400 */
+  --background: #111827; /* Gray 900 */
+  --card-background: #1f2937; /* Gray 800 */
+  --text-primary: #f9fafb; /* Gray 50 */
+  --text-secondary: #9ca3af; /* Gray 400 */
+  --border: #374151; /* Gray 700 */
+}

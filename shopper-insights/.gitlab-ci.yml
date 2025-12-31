@@ -1,0 +1,19 @@
+include:
+  - project: 'bildcraft/shared/ci-cd-pipelines'
+    file: '/ci-web-backend-api/python-typescript/.ci-code-publish-lambda-web-and-api.yml'
+    ref:  'main'
+
+variables:
+  API_FOLDER: "api"
+  BACKEND_FOLDER: "backend"
+  S3_BUCKET: "hyc-prod-lambda-source-codes"
+  S3_FOLDER: "blc-shopper-insights"
+  API_FILE_NAME: "blc-shopper-insights-api-source-codes.zip"
+  API_FUNCTION_NAME: "blc-shopper-insights-api-fn"
+  BACKEND_FILE_NAME: "blc-shopper-insights-backend-source-codes.zip"
+  BACKEND_FUNCTION_NAME: "blc-shopper-insights-backend-fn"
+
+stages:
+  - code-quality
+  - build
+  - deploy
