@@ -6,12 +6,11 @@ from crud import get_all_receipts as get_receipts
 from crud import get_receipt as crud_get_receipt
 from dependencies import get_db
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
-from schemas import ReceiptCreate, ReceiptResponse, ReceiptImage
+from schemas import ReceiptResponse, ReceiptImage
 from sqlalchemy.orm import Session
 from PIL import Image, UnidentifiedImageError
 
 router = APIRouter()
-
 
 @router.post("/", response_model=ReceiptResponse)
 async def create_receipt(

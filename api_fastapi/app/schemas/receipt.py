@@ -19,15 +19,6 @@ class Category(BaseModel):
     amount: float
     percentage: int
 
-class ReceiptCreate(BaseModel):
-    store: str
-    total: float
-    date: datetime
-    items: int
-    itemsList: List[Item]
-    categories: List[Category]
-
-
 class ReceiptResponse(BaseModel):
     id: int
     store: str

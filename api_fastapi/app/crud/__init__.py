@@ -4,3 +4,4 @@ from .receipt import create_receipt, get_all_receipts, get_receipt
 from .posts import get_community_posts
 from .recommendation import get_recommendations
 from .users import get_users
+from .receipt import get_all_receipts

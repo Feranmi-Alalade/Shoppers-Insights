@@ -11,7 +11,7 @@ app = FastAPI(title="Shoppers Insights API")
 
 app.include_router(api_router, prefix="/api/v1")
 
-dash_app = create_dash_app(app)
+dash_app = create_dash_app()
 
 app.mount("/dashboard", WSGIMiddleware(dash_app.server))
 

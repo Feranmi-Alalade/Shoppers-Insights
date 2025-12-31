@@ -9,9 +9,13 @@ from typing import Any, Dict, List, Optional
 from db import ReceiptDB
 from dependencies import get_db
 from fastapi import Depends
-from schemas import ReceiptCreate, ReceiptImage
+from schemas import ReceiptImage
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, UploadFile, File
+from schemas import ReceiptExtraction
+from dataclasses import asdict
+from datetime import datetime
+
 
 load_dotenv()
 
@@ -105,42 +109,46 @@ def create_receipt(receipt_base64: ReceiptImage, db: Session) -> ReceiptDB:
 
         receipt_json = json.loads(response.text)
 
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="AI returned invalid JSON")
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to process receipt with Gemini: {e}")
     
     try:
-        extracted_data = ReceiptCreate(
-            store=receipt_json.get("store"),
-            total= receipt_json.get("total"),
-            date=receipt_json.get("date"),
-            items=receipt_json.get("items"),
-            itemsList=receipt_json.get("itemsList", []),
-            categories=receipt_json.get("categories", [])
+        receipt_obj = ReceiptExtraction.from_dict(receipt_json)
+
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=f"Not in ReceiptExtraction format: {e}")
+
+    try:
+        parsed_date = None
+        if receipt_obj.date:
+            try:
+                parsed_date = datetime.strptime(receipt_obj.date, "%Y-%m-%d").date()
+            except ValueError:
+                # Fallback if AI returns a weird format, or leave as None
+                parsed_date = datetime.now().date()
+
+        db_receipt = ReceiptDB(
+            store=receipt_obj.store,
+            total=receipt_obj.total,
+            date=parsed_date,
+            items=receipt_obj.items,
+            status=receipt_obj.status,
+            
+            itemsList=json.dumps([asdict(i) for i in receipt_obj.itemsList]),
+            categories=json.dumps([asdict(c) for c in receipt_obj.categories])
         )
+
+        db.add(db_receipt)
+        db.commit()
+        db.refresh(db_receipt)
+        return db_receipt
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"The extracted data was not in ReceiptCreate format, {e}")         
 
-    try:
-        items_list_as_dicts = [item.model_dump() for item in extracted_data.itemsList]
-        categories_as_dicts = [cat.model_dump() for cat in extracted_data.categories]
-
-        db_receipt = ReceiptDB(
-            store=extracted_data.store,
-            total=extracted_data.total,
-            date=extracted_data.date,
-            items=extracted_data.items,
-            status="success",    
-            itemsList=json.dumps(items_list_as_dicts),
-            categories=json.dumps(categories_as_dicts)
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to map data to ReceiptDB: {e}")
-    
-    db.add(db_receipt)
-    db.commit()
-    db.refresh(db_receipt)
-    return db_receipt
 
 
 def get_all_receipts(db: Session) -> List[Dict[str, Any]]:

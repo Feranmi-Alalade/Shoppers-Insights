@@ -1,2 +1,3 @@
 from schemas.budget import BudgetCreate, BudgetResponse
-from schemas.receipt import ReceiptCreate, ReceiptResponse, ReceiptImage
+from schemas.receipt import ReceiptResponse, ReceiptImage
+from schemas.dataclasses import HealthInsightReport, ReceiptExtraction
