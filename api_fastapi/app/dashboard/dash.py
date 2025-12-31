@@ -392,6 +392,7 @@
     
 #     return dash_app
 
+
 import json
 import requests
 import pandas as pd
@@ -410,47 +411,58 @@ BACKGROUND_COLOR = "#60199a"
 def get_data():
     """Fetch data from API endpoint"""
     try:
-        # HTTP request
+        print(f"Fetching data from: {API_BASE_URL}/receipts/")
         response = requests.get(f"{API_BASE_URL}/receipts/")
 
         if response.status_code != 200:
             print(f"API Error: {response.status_code}")
-            return pd.DataFrame(columns=['status', 'total', 'date', 'categories', 'store'])
+            return pd.DataFrame()
         
-        # JSON data
         data = response.json()
-        
-        if not data:
-             return pd.DataFrame(columns=['status', 'total', 'date', 'categories', 'store'])
 
         # Create DataFrame
         df = pd.DataFrame(data)
         
-        # Clean Data
-        df['date'] = pd.to_datetime(df['date'])
+        # Convert None/NaN to empty list so the loop doesn't crash
+        df['categories'] = df['categories'].apply(lambda x: x if isinstance(x, list) else [])
+
+        df['date'] = pd.to_datetime(df['date'], errors='coerce')
         
+        # Explode Categories
         df = df.explode('categories') 
         
-        df['category_name'] = df['categories'].apply(
-            lambda x: x.get('name') if isinstance(x, dict) else 'Uncategorized'
-        )
-        df['category_amount'] = df['categories'].apply(
-            lambda x: x.get('amount') if isinstance(x, dict) else 0.0
-        )
+        # Extraction
+        def extract_name(x):
+            if isinstance(x, dict):
+                return x.get('name', 'Uncategorized')
+            return 'Uncategorized'
+
+        def extract_amount(x):
+            if isinstance(x, dict):
+                return x.get('amount', 0.0)
+            return 0.0
+
+        df['category_name'] = df['categories'].apply(extract_name)
+        df['category_amount'] = df['categories'].apply(extract_amount)
         
+        # Conversion for Filtering
         df['category_amount'] = pd.to_numeric(df['category_amount'], errors='coerce').fillna(0.0)
+        
+        if 'status' in df.columns:
+            df['status'] = df['status'].astype(str)
+            
+        # Filter out specific ignored categories
         df = df[~df['category_name'].isin(['Other', 'Others'])]
 
         return df
     
     except requests.exceptions.ConnectionError:
-        print("Could not connect to API")
-        return pd.DataFrame(columns=['status', 'total', 'date', 'categories', 'store'])
+        print(f"Connection Error: Cannot connect to {API_BASE_URL}")
+        return pd.DataFrame()
 
     except Exception as e:
-        print(f"Error returned: {e}")
-        # Return empty structure to prevent crashes
-        return pd.DataFrame(columns=['status', 'total', 'date', 'categories', 'store'])
+        print(f"ERROR in get_data: {e}")
+        return pd.DataFrame()
     
 
 def create_dash_app():
@@ -470,7 +482,7 @@ def create_dash_app():
     )
 
     # Load initial data for the dropdown
-    initial_df = get_data()
+    # initial_df = get_data()
 
     # Navigation Bar
     navbar = dbc.NavbarSimple(
@@ -489,7 +501,7 @@ def create_dash_app():
                     html.Label("Filter by Status", className="fw-bold text-muted"),
                     dcc.Dropdown(
                         id='status-dropdown',
-                        options=[{'label': i, 'value': i} for i in initial_df['status'].unique()] if not initial_df.empty else [],
+                        options=[],
                         value=None,
                         placeholder="Select Status",
                         className="mb-0",
@@ -502,7 +514,7 @@ def create_dash_app():
                     html.Label("Filter by Category", className="fw-bold text-muted"),
                     dcc.Dropdown(
                         id='category-dropdown',
-                        options=[{'label': str(i), 'value': i} for i in initial_df['category_name'].unique()] if not initial_df.empty else [],
+                        options=[],
                         value=None,
                         placeholder="Select Category",
                         className="mb-0",
@@ -522,6 +534,8 @@ def create_dash_app():
     ], className="shadow-sm border-0 h-100")
 
     dash_app.layout = html.Div([
+        dcc.Location(id='url', refresh=False),
+
         navbar,
         
         dbc.Container([
@@ -636,6 +650,23 @@ def create_dash_app():
 
 
     @dash_app.callback(
+        [Output('status-dropdown', 'options'),
+         Output('category-dropdown', 'options')],
+        [Input('url', 'pathname')]
+    )
+    def populate_dropdowns(_):
+        # This now runs ONLY when the user loads the page, so the server is UP.
+        df = get_data()
+        
+        if df.empty:
+            return [], []
+            
+        status_opts = [{'label': i, 'value': i} for i in sorted(df['status'].unique())]
+        cat_opts = [{'label': str(i), 'value': i} for i in sorted(df['category_name'].unique())]
+        
+        return status_opts, cat_opts
+
+    @dash_app.callback(
         [Output('category-pie', 'figure'),
          Output('category-bar', 'figure'),
          Output('time-series', 'figure'),
@@ -695,6 +726,18 @@ def create_dash_app():
             color='category_name', size='total', 
             hover_data=['store'],
             labels={'date': 'Date of Purchase', 'category_amount': 'Amount Spent ($)', 'category_name': 'Type'},
+            color_discrete_sequence=px.colors.qualitative.Pastel
+        )
+        fig_line.update_layout(template='plotly_white', margin=dict(l=20, r=20, t=20, b=20))
+
+        # Timeline
+        # Check if store exists in data, if not don't use it in hover
+        hover_data = ['store'] if 'store' in filtered_df.columns else None
+        
+        fig_line = px.scatter(
+            filtered_df, x='date', y='category_amount', 
+            color='category_name', size='total',
+            hover_data=hover_data,
             color_discrete_sequence=px.colors.qualitative.Pastel
         )
         fig_line.update_layout(template='plotly_white', margin=dict(l=20, r=20, t=20, b=20))
